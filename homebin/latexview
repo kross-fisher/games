@@ -1,0 +1,17 @@
+#!/bin/bash
+
+echo $1 | grep -q "\.tex$" || {
+    echo "usage: $(basename $0) <file.tex>"
+    exit
+}
+
+temp=$(tempfile | tr '/' 't')
+cp $1 /tmp/${temp}.tex
+
+cd /tmp; pdflatex ${temp}.tex
+if [ $? -eq 0 ]; then
+    mv ${temp}.pdf out.pdf
+    xdg-open out.pdf
+fi
+
+rm -f ${temp}.*
