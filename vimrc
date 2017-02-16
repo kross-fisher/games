@@ -1,7 +1,7 @@
 " An example for a vimrc file.
 "
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last change:	2011 Apr 15
+" Last change:	2016 Mar 25
 "
 " To use it, copy it to
 "     for Unix and OS/2:  ~/.vimrc
@@ -24,7 +24,8 @@ set backspace=indent,eol,start
 if has("vms")
   set nobackup		" do not keep a backup file, use versions instead
 else
-  set backup		" keep a backup file
+  set backup		" keep a backup file (restore to previous version)
+  set undofile		" keep an undo file (undo changes after closing)
 endif
 set history=50		" keep 50 lines of command line history
 set ruler		" show the cursor position all the time
@@ -72,10 +73,8 @@ if has("autocmd")
   " When editing a file, always jump to the last known cursor position.
   " Don't do it when the position is invalid or when inside an event handler
   " (happens when dropping a file on gvim).
-  " Also don't do it when the mark is in the first line, that is the default
-  " position when opening a file.
   autocmd BufReadPost *
-    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \ if line("'\"") >= 1 && line("'\"") <= line("$") |
     \   exe "normal! g`\"" |
     \ endif
 
@@ -95,6 +94,20 @@ if !exists(":DiffOrig")
 		  \ | wincmd p | diffthis
 endif
 
+if has('langmap') && exists('+langnoremap')
+  " Prevent that the langmap option applies to characters that result from a
+  " mapping.  If unset (default), this may break plugins (but it's backward
+  " compatible).
+  set langnoremap
+endif
+
+
+" Add optional packages.
+"
+" The matchit plugin makes the % command work better, but it is not backwards
+" compatible.
+packadd matchit
+
 
 set nobackup
 
@@ -107,6 +120,5 @@ inoremap { {}<LEFT>
 inoremap [ []<LEFT>
 inoremap " ""<LEFT>
 
-let loaded_matchparen=1
 set matchpairs+=<:>
-set fileencodings=ucs-bom,utf-8,gb2312,gbk,latin1
+let loaded_matchparen=1
